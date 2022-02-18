@@ -108,16 +108,16 @@ class JackClient():
         return True
 
     def get_audio_inputs(self):
-        return [p for p in self.ports if AUDIO_INPUT(p)]
+        return [p for p in self.ports if is_audio_input(p)]
 
     def get_audio_outputs(self):
-        return [p for p in self.ports if AUDIO_OUTPUT(p)]
+        return [p for p in self.ports if is_audio_output(p)]
 
     def get_midi_inputs(self):
-        return [p for p in self.ports if MIDI_INPUT(p)]
+        return [p for p in self.ports if is_midi_input(p)]
 
     def get_midi_outputs(self):
-        return [p for p in self.ports if MIDI_OUTPUT(p)]
+        return [p for p in self.ports if is_midi_output(p)]
 
     def get_inputs(self, port_type):
         return [p for p in self.ports if p.is_input() and p.get_type() == port_type]
@@ -186,16 +186,16 @@ def disconnect(s_port, d_port):
 #for c in getPorts():
 #    print(c)
 
-def AUDIO_INPUT(port):
+def is_audio_input(port):
     return port.isInput() and port.getType() == AUDIO_PORT
 
-def AUDIO_OUTPUT(port):
+def is_audio_output(port):
     return port.isOutput() and port.getType() == AUDIO_PORT
 
-def MIDI_INPUT(port):
+def is_midi_input(port):
     return port.isInput() and port.getType() == MIDI_PORT
 
-def MIDI_OUTPUT(port):
+def is_midi_output(port):
     return port.isOutput() and port.getType() == MIDI_PORT
 
 def system_clients():
