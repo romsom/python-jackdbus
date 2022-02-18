@@ -210,8 +210,8 @@ if __name__ == "__main__":
     parser.add_argument('--dport', default=".*", help='Regex for the destination jack port')
     parser.add_argument('--number-of-ports', '-n', default=-1, type=int,
                         help='Limit the number of consecutive connections to NUMBER_OF_PORTS')
-    parser.add_argument('--sstart', default=0, type=int)
-    parser.add_argument('--dstart', default=0, type=int)
+    parser.add_argument('--sstart', default=0, type=int, help='The index of the first source match to be connected')
+    parser.add_argument('--dstart', default=0, type=int, help='The index of the first destination match to be connected')
 
     args = parser.parse_args()
 
