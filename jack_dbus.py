@@ -33,10 +33,10 @@ class JackPort():
         reference: common/JackPortType.h"""
         if self.type == 0:
             return AUDIO_PORT
-        elif self.type == 1:
+        if self.type == 1:
             return MIDI_PORT
-        else:
-            return UNKNOWN_PORT
+        return UNKNOWN_PORT
+
     # reference for flags: common/jack/types.h -> JackPortFlags
 
     def isInput(self):
