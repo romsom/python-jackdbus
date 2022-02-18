@@ -27,6 +27,7 @@ class JackPort():
         self.clientID = clientID
         self.type = ptype
         self.flags = flags
+
     def getType(self):
         """get string representation of port type
         reference: common/JackPortType.h"""
@@ -37,29 +38,39 @@ class JackPort():
         else:
             return UNKNOWN_PORT
     # reference for flags: common/jack/types.h -> JackPortFlags
+
     def isInput(self):
         return self.flags & 0x1 != 0
+
     def isOutput(self):
         return self.flags & 0x2 != 0
+
     def isPhysical(self):
         return self.flags & 0x4 != 0
     # missing: canMonitor (0x8), isTerminal(0x10)
+
     def __str__(self):
         return "{}:{}".format(self.client, self.port)
+
     def __repr__(self):
         return self.__str__()
+
     def __eq__(self, other):
         return self.client == other.client and self.port == other.port
+
     def isID(self, clientID, portID):
         return clientID == self.clientID and portID == self.portID
+
     def isPort(self, client, port):
         return client == self.client and port == self.port
+
 
 class JackConnection():
     def __init__(self, dbus_data, ports):
         self.source = [p for p in ports if p.lookupPortByName(dbus_data[1], dbus_data[3]) is not None][0]
         self.dest = [p for p in ports if p.lookupPortByName(dbus_data[5], dbus_data[7]) is not None][0]
         self.id = dbus_data[8]
+
     def __str__(self):
         return "{} -> {}".format(self.source, self.dest)
 
@@ -69,20 +80,24 @@ class JackClient():
         self.name = dbus_data[1]
         self.ports = [JackPort(self.name, d[1], self.id, d[0], d[3], d[2]) for d in dbus_data[2]]
         self.pid = jack_patchbay.GetClientPID(self.id)
+
     def lookupPort(self, clientID, portID):
         for p in self.ports:
             if p.isID(clientID, portID):
                 return p
         return None
+
     def lookupPortByName(self, client, port):
         for p in self.ports:
             if p.isPort(client, port):
                 return port
         return None
+
     def getPortsByName(self, port):
         """get all matching ports"""
         r = re.compile(port)
         return [p for p in self.ports if r.match(str(p.port))]
+
     def hasAllPorts(self, predicate_funcs):
         '''expects a function with self.ports as the only parameter which returns
         a tuple of a list of predicates which describe ports and the number of
@@ -91,35 +106,50 @@ class JackClient():
             if len([p for p in self.ports if predicate(p)]) < n:
                 return False
         return True
+
     def getAudioInputs(self):
         return [p for p in self.ports if AUDIO_INPUT(p)]
+
     def getAudioOutputs(self):
         return [p for p in self.ports if AUDIO_OUTPUT(p)]
+
     def getMidiInputs(self):
         return [p for p in self.ports if MIDI_INPUT(p)]
+
     def getMidiOutputs(self):
         return [p for p in self.ports if MIDI_OUTPUT(p)]
+
     def getInputs(self, port_type):
         return [p for p in self.ports if p.isInput() and p.getType() == port_type]
+
     def getOutputs(self, port_type):
         return [p for p in self.ports if p.isOutput() and p.getType() == port_type]
+
     def getName(self):
         return self.name
+
     def __str__(self):
         return "{}: {}\n\t{}".format(self.name, self.id, self.ports)
+
     def __repr__(self):
         return "{} [{}]".format(self.name, self.pid)
+
+
 class JackGraph():
     def __init__(self, dbus_data):
         self.version = dbus_data[0]
         self.clients = [JackClient(d) for d in dbus_data[1]]
         self.connections = [JackConnection(d, self.clients) for d in dbus_data[2]]
+
     def lookupPort(self, clientID, portID):
         return self.clients.lookupPort(clientID, portID)
+
     def lookupPortByName(self, client, port):
         return self.clients.lookupPortByName(client, port)
+
     def ports(self):
         return reduce(lambda a,b: a+b, [c.ports for c in self.clients], [])
+
 
 def getGraph():
     return JackGraph(jack_patchbay.GetGraph(0))
