@@ -72,7 +72,7 @@ class JackClient():
     def lookupPort(self, clientID, portID):
         for p in self.ports:
             if p.isID(clientID, portID):
-                return port
+                return p
         return None
     def lookupPortByName(self, client, port):
         for p in self.ports:
