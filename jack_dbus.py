@@ -202,10 +202,10 @@ def system_clients():
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser("Autoconnect jack ports")
-    parser.add_argument('--sclient', default=".*")
+    parser = argparse.ArgumentParser("Autoconnect consecutive jack ports by regular expressions")
+    parser.add_argument('--sclient', default="", required=True)
     parser.add_argument('--sport', default=".*")
-    parser.add_argument('--dclient', default=".*")
+    parser.add_argument('--dclient', default="", required=True)
     parser.add_argument('--dport', default=".*")
     parser.add_argument('--number-of-ports', '-n', default=-1, type=int)
     parser.add_argument('--sstart', default=0)
