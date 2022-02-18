@@ -49,6 +49,18 @@ class JackPort():
         return self.flags & 0x4 != 0
     # missing: can_monitor (0x8), is_terminal(0x10)
 
+    def is_audio_input(self):
+        return self.is_input() and self.get_type() == AUDIO_PORT
+
+    def is_audio_output(self):
+        return self.is_output() and self.get_type() == AUDIO_PORT
+
+    def is_midi_input(self):
+        return self.is_input() and self.get_type() == MIDI_PORT
+
+    def is_midi_output(self):
+        return self.is_output() and self.get_type() == MIDI_PORT
+
     def __str__(self):
         return "{}:{}".format(self.client, self.port)
 
@@ -108,16 +120,16 @@ class JackClient():
         return True
 
     def get_audio_inputs(self):
-        return [p for p in self.ports if is_audio_input(p)]
+        return [p for p in self.ports if p.is_audio_input()]
 
     def get_audio_outputs(self):
-        return [p for p in self.ports if is_audio_output(p)]
+        return [p for p in self.ports if p.is_audio_output()]
 
     def get_midi_inputs(self):
-        return [p for p in self.ports if is_midi_input(p)]
+        return [p for p in self.ports if p.is_midi_input()]
 
     def get_midi_outputs(self):
-        return [p for p in self.ports if is_midi_output(p)]
+        return [p for p in self.ports if p.is_midi_output()]
 
     def get_inputs(self, port_type):
         return [p for p in self.ports if p.is_input() and p.get_type() == port_type]
@@ -183,20 +195,6 @@ def disconnect(s_port, d_port):
     print('disconnecting [{}:{}] -|> [{}:{}]'.format(s_port.client, s_port.port, d_port.client, d_port.port))
     jack_patchbay.DisconnectPortsByName(dbus.String(s_port.client), dbus.String(s_port.port),
                                         dbus.String(d_port.client), dbus.String(d_port.port))
-#for c in getPorts():
-#    print(c)
-
-def is_audio_input(port):
-    return port.isInput() and port.getType() == AUDIO_PORT
-
-def is_audio_output(port):
-    return port.isOutput() and port.getType() == AUDIO_PORT
-
-def is_midi_input(port):
-    return port.isInput() and port.getType() == MIDI_PORT
-
-def is_midi_output(port):
-    return port.isOutput() and port.getType() == MIDI_PORT
 
 def system_clients():
     return get_clients_by_name(r'system|firewire_pcm')
