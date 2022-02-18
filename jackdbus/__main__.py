@@ -17,6 +17,8 @@ AUDIO_PORT = 'audio'
 MIDI_PORT = 'midi'
 UNKNOWN_PORT = 'unknown'
 
+SYSTEM_CLIENT_REGEX=r'system|firewire_pcm'
+
 class JackPort():
     def __init__(self, client, port, client_id, port_id, ptype, flags):
         # TODO? ids
@@ -198,15 +200,15 @@ def disconnect(s_port, d_port):
                                         dbus.String(d_port.client), dbus.String(d_port.port))
 
 def system_clients():
-    return get_clients_by_name(r'system|firewire_pcm')
+    return get_clients_by_name(SYSTEM_CLIENT_REGEX)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Connect/disconnect jack ports consecutively by matching them with regular expressions.")
     parser.add_argument('action', choices=['connect', 'disconnect'], help='Should the ports be connected or disconnected?')
-    parser.add_argument('--sclient', default="", required=True, help='Regex for the source jack client')
+    parser.add_argument('--sclient', default=SYSTEM_CLIENT_REGEX, help='Regex for the source jack client')
     parser.add_argument('--sport', default=".*", help='Regex for the source jack port')
-    parser.add_argument('--dclient', default="", required=True, help='Regex for the destination jack client')
+    parser.add_argument('--dclient', default=SYSTEM_CLIENT_REGEX, help='Regex for the destination jack client')
     parser.add_argument('--dport', default=".*", help='Regex for the destination jack port')
     parser.add_argument('--number-of-ports', '-n', default=-1, type=int,
                         help='Limit the number of consecutive connections to NUMBER_OF_PORTS')
