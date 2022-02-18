@@ -224,8 +224,8 @@ if __name__ == "__main__":
     dest_port_re = re.compile(args.dport)
 
     ports = get_ports()
-    sources = [p for p in ports if source_client_re.match(p.client) and source_port_re.match(p.port)]
-    dests = [p for p in ports if dest_client_re.match(p.client) and dest_port_re.match(p.port)]
+    sources = [p for p in ports if source_client_re.match(p.client) and source_port_re.match(p.port) and p.is_output()]
+    dests = [p for p in ports if dest_client_re.match(p.client) and dest_port_re.match(p.port) and p.is_input()]
 
     n = min(len(sources), len(dests))
     if args.number_of_ports >= 0:
@@ -236,9 +236,7 @@ if __name__ == "__main__":
 
     if args.action == 'connect':
         for s, d in pairs:
-            if s.is_output() and d.is_input():
-                connect(s, d)
+            connect(s, d)
     elif args.action == 'disconnect':
         for s, d in pairs:
-            if s.is_output() and d.is_input():
-                disconnect(s, d)
+            disconnect(s, d)
