@@ -202,14 +202,16 @@ def system_clients():
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser("Autoconnect consecutive jack ports by regular expressions")
-    parser.add_argument('--sclient', default="", required=True)
-    parser.add_argument('--sport', default=".*")
-    parser.add_argument('--dclient', default="", required=True)
-    parser.add_argument('--dport', default=".*")
-    parser.add_argument('--number-of-ports', '-n', default=-1, type=int)
-    parser.add_argument('--sstart', default=0)
-    parser.add_argument('--dstart', default=0)
+    parser = argparse.ArgumentParser(description="Connect/disconnect jack ports consecutively by matching them with regular expressions.")
+    parser.add_argument('action', choices=['connect', 'disconnect'], help='Should the ports be connected or disconnected?')
+    parser.add_argument('--sclient', default="", required=True, help='Regex for the source jack client')
+    parser.add_argument('--sport', default=".*", help='Regex for the source jack port')
+    parser.add_argument('--dclient', default="", required=True, help='Regex for the destination jack client')
+    parser.add_argument('--dport', default=".*", help='Regex for the destination jack port')
+    parser.add_argument('--number-of-ports', '-n', default=-1, type=int,
+                        help='Limit the number of consecutive connections to NUMBER_OF_PORTS')
+    parser.add_argument('--sstart', default=0, type=int)
+    parser.add_argument('--dstart', default=0, type=int)
 
     args = parser.parse_args()
 
@@ -228,7 +230,12 @@ if __name__ == "__main__":
     send = min(len(sources), args.sstart + n)
     dend = min(len(dests), args.dstart + n)
     pairs = zip(sources[args.sstart:send], dests[args.dstart:dend])
-    for s, d in pairs:
-        if s.is_output() and d.is_input():
-            print("{}\t-> {}".format(s,d))
-            connect(s, d)
+
+    if args.action == 'connect':
+        for s, d in pairs:
+            if s.is_output() and d.is_input():
+                connect(s, d)
+    elif args.action == 'disconnect':
+        for s, d in pairs:
+            if s.is_output() and d.is_input():
+                disconnect(s, d)
