@@ -213,14 +213,14 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    shre = re.compile(args.sclient)
-    spre = re.compile(args.sport)
-    dhre = re.compile(args.dclient)
-    dpre = re.compile(args.dport)
+    source_client_re = re.compile(args.sclient)
+    source_port_re = re.compile(args.sport)
+    dest_client_re = re.compile(args.dclient)
+    dest_port_re = re.compile(args.dport)
 
     ports = get_ports()
-    sources = [p for p in ports if shre.match(p.client) and spre.match(p.port)]
-    dests = [p for p in ports if dhre.match(p.client) and dpre.match(p.port)]
+    sources = [p for p in ports if source_client_re.match(p.client) and source_port_re.match(p.port)]
+    dests = [p for p in ports if dest_client_re.match(p.client) and dest_port_re.match(p.port)]
 
     n = min(len(sources), len(dests))
     if args.number_of_ports >= 0:
