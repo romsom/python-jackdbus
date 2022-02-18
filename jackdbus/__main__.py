@@ -204,7 +204,8 @@ def system_clients():
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Connect/disconnect jack ports consecutively by matching them with regular expressions.")
+    parser = argparse.ArgumentParser(description="Connect/disconnect jack ports consecutively by matching them with regular expressions.",
+                                     prog='jack_re_connect')
     parser.add_argument('action', choices=['connect', 'disconnect'], help='Should the ports be connected or disconnected?')
     parser.add_argument('--sclient', default=SYSTEM_CLIENT_REGEX, help='Regex for the source jack client')
     parser.add_argument('--sport', default=".*", help='Regex for the source jack port')
