@@ -17,18 +17,18 @@ MIDI_PORT = 'midi'
 UNKNOWN_PORT = 'unknown'
 
 class JackPort():
-    def __init__(self, client, port, clientID, portID, ptype, flags):
+    def __init__(self, client, port, client_id, port_id, ptype, flags):
         # TODO? ids
         #if isinstance(client, dbus.String):
         #    self.client = client.
         self.client = client
         self.port = port
-        self.portID = portID
-        self.clientID = clientID
+        self.port_id = port_id
+        self.client_id = client_id
         self.type = ptype
         self.flags = flags
 
-    def getType(self):
+    def get_type(self):
         """get string representation of port type
         reference: common/JackPortType.h"""
         if self.type == 0:
@@ -39,15 +39,15 @@ class JackPort():
 
     # reference for flags: common/jack/types.h -> JackPortFlags
 
-    def isInput(self):
+    def is_input(self):
         return self.flags & 0x1 != 0
 
-    def isOutput(self):
+    def is_output(self):
         return self.flags & 0x2 != 0
 
-    def isPhysical(self):
+    def is_physical(self):
         return self.flags & 0x4 != 0
-    # missing: canMonitor (0x8), isTerminal(0x10)
+    # missing: can_monitor (0x8), is_terminal(0x10)
 
     def __str__(self):
         return "{}:{}".format(self.client, self.port)
@@ -58,17 +58,17 @@ class JackPort():
     def __eq__(self, other):
         return self.client == other.client and self.port == other.port
 
-    def isID(self, clientID, portID):
-        return clientID == self.clientID and portID == self.portID
+    def is_id(self, client_id, port_id):
+        return client_id == self.client_id and port_id == self.port_id
 
-    def isPort(self, client, port):
+    def is_port(self, client, port):
         return client == self.client and port == self.port
 
 
 class JackConnection():
     def __init__(self, dbus_data, ports):
-        self.source = [p for p in ports if p.lookupPortByName(dbus_data[1], dbus_data[3]) is not None][0]
-        self.dest = [p for p in ports if p.lookupPortByName(dbus_data[5], dbus_data[7]) is not None][0]
+        self.source = [p for p in ports if p.lookup_port_by_name(dbus_data[1], dbus_data[3]) is not None][0]
+        self.dest = [p for p in ports if p.lookup_port_by_name(dbus_data[5], dbus_data[7]) is not None][0]
         self.id = dbus_data[8]
 
     def __str__(self):
@@ -81,24 +81,24 @@ class JackClient():
         self.ports = [JackPort(self.name, d[1], self.id, d[0], d[3], d[2]) for d in dbus_data[2]]
         self.pid = jack_patchbay.GetClientPID(self.id)
 
-    def lookupPort(self, clientID, portID):
+    def lookup_port(self, client_id, port_id):
         for p in self.ports:
-            if p.isID(clientID, portID):
+            if p.is_id(client_id, port_id):
                 return p
         return None
 
-    def lookupPortByName(self, client, port):
+    def lookup_port_by_name(self, client, port):
         for p in self.ports:
-            if p.isPort(client, port):
+            if p.is_port(client, port):
                 return port
         return None
 
-    def getPortsByName(self, port):
+    def get_ports_by_name(self, port):
         """get all matching ports"""
         r = re.compile(port)
         return [p for p in self.ports if r.match(str(p.port))]
 
-    def hasAllPorts(self, predicate_funcs):
+    def has_all_ports(self, predicate_funcs):
         '''expects a function with self.ports as the only parameter which returns
         a tuple of a list of predicates which describe ports and the number of
         expected ports'''
@@ -107,25 +107,25 @@ class JackClient():
                 return False
         return True
 
-    def getAudioInputs(self):
+    def get_audio_inputs(self):
         return [p for p in self.ports if AUDIO_INPUT(p)]
 
-    def getAudioOutputs(self):
+    def get_audio_outputs(self):
         return [p for p in self.ports if AUDIO_OUTPUT(p)]
 
-    def getMidiInputs(self):
+    def get_midi_inputs(self):
         return [p for p in self.ports if MIDI_INPUT(p)]
 
-    def getMidiOutputs(self):
+    def get_midi_outputs(self):
         return [p for p in self.ports if MIDI_OUTPUT(p)]
 
-    def getInputs(self, port_type):
-        return [p for p in self.ports if p.isInput() and p.getType() == port_type]
+    def get_inputs(self, port_type):
+        return [p for p in self.ports if p.is_input() and p.get_type() == port_type]
 
-    def getOutputs(self, port_type):
-        return [p for p in self.ports if p.isOutput() and p.getType() == port_type]
+    def get_outputs(self, port_type):
+        return [p for p in self.ports if p.is_output() and p.get_type() == port_type]
 
-    def getName(self):
+    def get_name(self):
         return self.name
 
     def __str__(self):
@@ -141,48 +141,48 @@ class JackGraph():
         self.clients = [JackClient(d) for d in dbus_data[1]]
         self.connections = [JackConnection(d, self.clients) for d in dbus_data[2]]
 
-    def lookupPort(self, clientID, portID):
-        return self.clients.lookupPort(clientID, portID)
+    def lookup_port(self, client_id, port_id):
+        return self.clients.lookup_port(client_id, port_id)
 
-    def lookupPortByName(self, client, port):
-        return self.clients.lookupPortByName(client, port)
+    def lookup_port_by_name(self, client, port):
+        return self.clients.lookup_port_by_name(client, port)
 
     def ports(self):
         return reduce(lambda a,b: a+b, [c.ports for c in self.clients], [])
 
 
-def getGraph():
+def get_graph():
     return JackGraph(jack_patchbay.GetGraph(0))
 
-def getClients():
+def get_clients():
     graph = JackGraph(jack_patchbay.GetGraph(0))
     return graph.clients
 
-def getClientsByPID(pid):
-    cs = getClients()
+def get_clients_by_pid(pid):
+    cs = get_clients()
     return [c for c in cs if c.pid == pid]
 
-def getClientsByName(name):
-    cs = getClients()
+def get_clients_by_name(name):
+    cs = get_clients()
     r = re.compile(name)
     return [c for c in cs if r.match(c.name)]
 
-def getPorts():
+def get_ports():
     graph = JackGraph(jack_patchbay.GetGraph(0))
     return graph.ports()
 
-def getConnections():
+def get_connections():
     graph = JackGraph(jack_patchbay.GetGraph(0))
     return graph.connections
 
-def connect(sPort, dPort):
-    print('connecting [{}:{}] -> [{}:{}]'.format(sPort.client, sPort.port, dPort.client, dPort.port))
-    jack_patchbay.ConnectPortsByName(sPort.client, sPort.port,
-                                     dPort.client, dPort.port)
-def disconnect(sPort, dPort):
-    print('disconnecting [{}:{}] -|> [{}:{}]'.format(sPort.client, sPort.port, dPort.client, dPort.port))
-    jack_patchbay.DisconnectPortsByName(dbus.String(sPort.client), dbus.String(sPort.port),
-                                     dbus.String(dPort.client), dbus.String(dPort.port))
+def connect(s_port, d_port):
+    print('connecting [{}:{}] -> [{}:{}]'.format(s_port.client, s_port.port, d_port.client, d_port.port))
+    jack_patchbay.ConnectPortsByName(s_port.client, s_port.port,
+                                     d_port.client, d_port.port)
+def disconnect(s_port, d_port):
+    print('disconnecting [{}:{}] -|> [{}:{}]'.format(s_port.client, s_port.port, d_port.client, d_port.port))
+    jack_patchbay.DisconnectPortsByName(dbus.String(s_port.client), dbus.String(s_port.port),
+                                        dbus.String(d_port.client), dbus.String(d_port.port))
 #for c in getPorts():
 #    print(c)
 
@@ -196,4 +196,4 @@ def MIDI_OUTPUT(port):
     return port.isOutput() and port.getType() == MIDI_PORT
 
 def system_clients():
-    return getClientsByName(r'system|firewire_pcm')
+    return get_clients_by_name(r'system|firewire_pcm')
