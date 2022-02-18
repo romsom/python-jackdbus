@@ -188,10 +188,13 @@ def disconnect(s_port, d_port):
 
 def AUDIO_INPUT(port):
     return port.isInput() and port.getType() == AUDIO_PORT
+
 def AUDIO_OUTPUT(port):
     return port.isOutput() and port.getType() == AUDIO_PORT
+
 def MIDI_INPUT(port):
     return port.isInput() and port.getType() == MIDI_PORT
+
 def MIDI_OUTPUT(port):
     return port.isOutput() and port.getType() == MIDI_PORT
 
