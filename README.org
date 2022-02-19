@@ -69,7 +69,8 @@ python -m jackdbus connect --sclient system --sport 'capture_' --dclient system 
 : connecting [system:capture_6] -> [system:playback_9]
 Here =-n 4= limits the number of connections to 4.
 
-But they can:
+You still can match the whole client or port name.
+You can also leave out port regexes, if you want to match all ports.
 #+begin_src sh :exports both :results output
 python -m jackdbus disconnect --sclient '^system$' --dclient '^system$' --sstart 2 --dstart 5 -n 4
 #+end_src
@@ -79,7 +80,6 @@ python -m jackdbus disconnect --sclient '^system$' --dclient '^system$' --sstart
 : disconnecting [system:capture_4] -|> [system:playback_7]
 : disconnecting [system:capture_5] -|> [system:playback_8]
 : disconnecting [system:capture_6] -|> [system:playback_9]
-You can leave out port regexes, if you want to match all ports.
 
 You can also leave out client regexes if you want to connect to system ports:
 #+begin_src sh :exports both :results output
