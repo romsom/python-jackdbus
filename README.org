@@ -1,0 +1,93 @@
+* python-dbus
+Python library to manage JACK connections from python via DBUS and cli geek tool to create/break multiple connections at once using regular expressions.
+
+#+begin_src sh :export results :results output
+python -m jackdbus -h
+#+end_src
+
+#+RESULTS:
+#+begin_example
+usage: jack_re_connect [-h] --sclient SCLIENT [--sport SPORT] --dclient
+                       DCLIENT [--dport DPORT]
+                       [--number-of-ports NUMBER_OF_PORTS] [--sstart SSTART]
+                       [--dstart DSTART]
+                       {connect,disconnect}
+
+Connect/disconnect jack ports consecutively by matching them with regular
+expressions.
+
+positional arguments:
+  {connect,disconnect}  Should the ports be connected or disconnected?
+
+options:
+  -h, --help            show this help message and exit
+  --sclient SCLIENT     Regex for the source jack client
+  --sport SPORT         Regex for the source jack port
+  --dclient DCLIENT     Regex for the destination jack client
+  --dport DPORT         Regex for the destination jack port
+  --number-of-ports NUMBER_OF_PORTS, -n NUMBER_OF_PORTS
+                        Limit the number of consecutive connections to
+                        NUMBER_OF_PORTS
+  --sstart SSTART       The index of the first source match to be connected
+  --dstart DSTART       The index of the first destination match to be
+                        connected
+#+end_example
+
+
+** Examples
+You can use regular expressions to short cut long names and to select multiple ports at once:
+#+begin_src sh :export both :results output
+python -m jackdbus connect --sclient 'setBfree.*' --sport 'out[LR]' --dclient system --dport 'playback_[56]'
+#+end_src
+
+#+RESULTS:
+: connecting [setBfree DSP Tonewheel Organ:outL] -> [system:playback_5]
+: connecting [setBfree DSP Tonewheel Organ:outR] -> [system:playback_6]
+
+If the regexes match more than one source and destination port, consecutive pairs will be connected.
+
+You can also specify which matching port should be the first to be connected on either side (0-based):
+#+begin_src sh :export both :results output
+python -m jackdbus connect --sclient 'setBfree.*' --sport 'out[LR]' --dclient system --dport 'playback_.*' --dstart 4
+#+end_src
+
+#+RESULTS:
+: connecting [setBfree DSP Tonewheel Organ:outL] -> [system:playback_5]
+: connecting [setBfree DSP Tonewheel Organ:outR] -> [system:playback_6]
+
+If on either side there are more matching port than on the other, only pairs up to the minimum number will be connected or disconnected.
+
+Regexes don't have to match the whole name:
+#+begin_src sh :export both :results output
+python -m jackdbus connect --sclient system --sport 'capture_' --dclient system --dport 'playback_' --sstart 2 --dstart 5 -n 4
+#+end_src
+
+#+RESULTS:
+: connecting [system:capture_3] -> [system:playback_6]
+: connecting [system:capture_4] -> [system:playback_7]
+: connecting [system:capture_5] -> [system:playback_8]
+: connecting [system:capture_6] -> [system:playback_9]
+Here =-n 4= limits the number of connections to 4.
+
+But they can:
+#+begin_src sh :export both :results output
+python -m jackdbus disconnect --sclient '^system$' --dclient '^system$' --sstart 2 --dstart 5 -n 4
+#+end_src
+
+#+RESULTS:
+: disconnecting [system:capture_3] -|> [system:playback_6]
+: disconnecting [system:capture_4] -|> [system:playback_7]
+: disconnecting [system:capture_5] -|> [system:playback_8]
+: disconnecting [system:capture_6] -|> [system:playback_9]
+You can leave out port regexes, if you want to match all ports.
+
+You can also leave out client regexes if you want to connect to system ports:
+#+begin_src sh :export both :results output
+python -m jackdbus connect --sstart 2 --dstart 5 -n 4
+#+end_src
+
+#+RESULTS:
+: connecting [system:capture_3] -> [system:playback_6]
+: connecting [system:capture_4] -> [system:playback_7]
+: connecting [system:capture_5] -> [system:playback_8]
+: connecting [system:capture_6] -> [system:playback_9]
