@@ -3,6 +3,7 @@ name = "jackdbus"
 version = "0.1.0"
 description = ""
 authors = ["Roman Sommer <roman@resonant-bytes.de>"]
+license = "BSD-2-Clause"
 
 [tool.poetry.dependencies]
 python = "^3.10"
