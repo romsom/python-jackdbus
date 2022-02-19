@@ -1,7 +1,7 @@
-* python-dbus
+* python-jackdbus
 Python library to manage JACK connections from python via DBUS and cli geek tool to create/break multiple connections at once using regular expressions.
 
-#+begin_src sh :export results :results output
+#+begin_src sh :exports results :results output
 python -m jackdbus -h
 #+end_src
 
@@ -36,7 +36,7 @@ options:
 
 ** Examples
 You can use regular expressions to short cut long names and to select multiple ports at once:
-#+begin_src sh :export both :results output
+#+begin_src sh :exports both :results output
 python -m jackdbus connect --sclient 'setBfree.*' --sport 'out[LR]' --dclient system --dport 'playback_[56]'
 #+end_src
 
@@ -47,7 +47,7 @@ python -m jackdbus connect --sclient 'setBfree.*' --sport 'out[LR]' --dclient sy
 If the regexes match more than one source and destination port, consecutive pairs will be connected.
 
 You can also specify which matching port should be the first to be connected on either side (0-based):
-#+begin_src sh :export both :results output
+#+begin_src sh :exports both :results output
 python -m jackdbus connect --sclient 'setBfree.*' --sport 'out[LR]' --dclient system --dport 'playback_.*' --dstart 4
 #+end_src
 
@@ -58,7 +58,7 @@ python -m jackdbus connect --sclient 'setBfree.*' --sport 'out[LR]' --dclient sy
 If on either side there are more matching port than on the other, only pairs up to the minimum number will be connected or disconnected.
 
 Regexes don't have to match the whole name:
-#+begin_src sh :export both :results output
+#+begin_src sh :exports both :results output
 python -m jackdbus connect --sclient system --sport 'capture_' --dclient system --dport 'playback_' --sstart 2 --dstart 5 -n 4
 #+end_src
 
@@ -70,7 +70,7 @@ python -m jackdbus connect --sclient system --sport 'capture_' --dclient system 
 Here =-n 4= limits the number of connections to 4.
 
 But they can:
-#+begin_src sh :export both :results output
+#+begin_src sh :exports both :results output
 python -m jackdbus disconnect --sclient '^system$' --dclient '^system$' --sstart 2 --dstart 5 -n 4
 #+end_src
 
@@ -82,7 +82,7 @@ python -m jackdbus disconnect --sclient '^system$' --dclient '^system$' --sstart
 You can leave out port regexes, if you want to match all ports.
 
 You can also leave out client regexes if you want to connect to system ports:
-#+begin_src sh :export both :results output
+#+begin_src sh :exports both :results output
 python -m jackdbus connect --sstart 2 --dstart 5 -n 4
 #+end_src
 
