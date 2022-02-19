@@ -7,8 +7,8 @@ python -m jackdbus -h
 
 #+RESULTS:
 #+begin_example
-usage: jack_re_connect [-h] --sclient SCLIENT [--sport SPORT] --dclient
-                       DCLIENT [--dport DPORT]
+usage: jack_re_connect [-h] [--sclient SCLIENT] [--sport SPORT]
+                       [--dclient DCLIENT] [--dport DPORT]
                        [--number-of-ports NUMBER_OF_PORTS] [--sstart SSTART]
                        [--dstart DSTART]
                        {connect,disconnect}
